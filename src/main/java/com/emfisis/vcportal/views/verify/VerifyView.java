@@ -2,6 +2,7 @@ package com.emfisis.vcportal.views.verify;
 
 import com.emfisis.vcportal.BackendCommunication;
 import com.emfisis.vcportal.utils.QrcodeImageCreator;
+import com.emfisis.vcportal.utils.RestCalling.Response;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
@@ -75,10 +76,13 @@ public class VerifyView extends Composite<VerticalLayout> {
         mainLayout.add(h3);
         mainLayout.add(formLayout2Col);
 
-        QrcodeImageCreator qrCodeImageCreator = new QrcodeImageCreator(backendCommunication.createVerificationUrl());
-        mainLayout.add(qrCodeImageCreator.getImage());
-        mainLayout.add(layoutRow);
-        layoutRow.add(buttonPrimary);
+        Response<String> verificationUrl = backendCommunication.createVerificationUrl();
+        if (verificationUrl.serverResponse.getStatus() == 200) {
+            QrcodeImageCreator qrCodeImageCreator = new QrcodeImageCreator(verificationUrl.entity);
+            mainLayout.add(qrCodeImageCreator.getImage());
+            mainLayout.add(layoutRow);
+            layoutRow.add(buttonPrimary);
+        }
     }
 
 
