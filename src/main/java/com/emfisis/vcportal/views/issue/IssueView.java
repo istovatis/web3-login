@@ -17,6 +17,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +60,7 @@ public class IssueView extends Composite<VerticalLayout> {
         getContent().add(layoutColumn2);
         layoutColumn2.add(h3);
         layoutColumn2.add(formLayout2Col);
-        Response<String> response = backendCommunication.createIssuingLink("frank");
+        Response<String> response = backendCommunication.createIssuingLink((String)VaadinSession.getCurrent().getAttribute("username"));
         if (response.serverResponse.getStatus() == 200) {
             QrcodeImageCreator qrCodeImageCreator = new QrcodeImageCreator(response.entity);
             layoutColumn2.add(qrCodeImageCreator.getImage());

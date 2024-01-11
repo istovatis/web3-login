@@ -27,6 +27,10 @@ public class BackendCommunication {
 
     private static Gson gson = new Gson();
 
+    //verification callbacks just to see that we get calls
+    //http://localhost:8080/verification-callback-api/success
+    //http://localhost:8080/verification-callback-api/fail
+    //where localhost the host of emfisis web3-login  ui portal(current vaadin service)
     public String createVerificationUrl() {
         try {
             Thread.sleep(1000);

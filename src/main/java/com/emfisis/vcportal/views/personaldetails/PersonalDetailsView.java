@@ -15,6 +15,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 
 @PageTitle("Personal Details")
@@ -50,6 +51,7 @@ public class PersonalDetailsView extends Composite<VerticalLayout> {
         buttonPrimary.getStyle().set("flex-grow", "1");
         buttonPrimary.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         buttonPrimary.addClickListener(buttonClickEvent -> {
+            VaadinSession.getCurrent().setAttribute("username", textField.getValue());
             UI.getCurrent().navigate("issue");
         });
         getContent().add(layoutColumn2);
