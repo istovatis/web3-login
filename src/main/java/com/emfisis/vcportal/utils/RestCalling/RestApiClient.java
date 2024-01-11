@@ -42,6 +42,16 @@ public class RestApiClient {
         return sendAppointmentsHttpEnclosingRequest(data, new HttpPost(url), jwtToken);
     }
 
+    public static ServerResponse sendPOST(String url, String data, Map<String, String> headers, Optional<String> jwtToken) {
+        HttpPost httpPost = new HttpPost(url);
+
+        for (Map.Entry<String, String> entry : headers.entrySet()) {
+            httpPost.addHeader(entry.getKey(), entry.getValue());
+        }
+
+        return sendAppointmentsHttpEnclosingRequest(data, httpPost, jwtToken);
+    }
+
     public static ServerResponse sendPOST(String url, List<NameValuePair> params, String data, Optional<String> jwtToken) {
         URI uri = addParams(url, params);
         return sendAppointmentsHttpEnclosingRequest(data, new HttpPost(uri), jwtToken);

@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
 import java.util.Optional;
 
 @Component
@@ -62,7 +64,8 @@ public class BackendCommunication {
         credentials.addRequestCredential(VPRequest.emfisisCredential);
         credentials.addVCPolicy(VPRequest.expired);
         String json = gson.toJson(credentials);
-        ServerResponse serverResponse = RestApiClient.sendPOST(verifierUri + "/openid4vc/verify", json, Optional.empty());
+        Map<String, String> headers = Map.of("successRedirectUri", "http://localhost:8080/verification-callback-api/success", "errorRedirectUri", "http://localhost:8080/verification-callback-api/error");
+        ServerResponse serverResponse = RestApiClient.sendPOST(verifierUri + "/openid4vc/verify", json, headers, Optional.empty());
         return new Response<>(serverResponse, serverResponse.getEntity());
     }
 }
