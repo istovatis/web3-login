@@ -2,6 +2,7 @@ package com.emfisis.vcportal.views.issue;
 
 import com.emfisis.vcportal.BackendCommunication;
 import com.emfisis.vcportal.utils.QrcodeImageCreator;
+import com.emfisis.vcportal.utils.RestCalling.Response;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -17,11 +18,15 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @PageTitle("Issue")
 @Route(value = "issue")
 @Uses(Icon.class)
 public class IssueView extends Composite<VerticalLayout> {
+
+    Logger logger = LoggerFactory.getLogger(IssueView.class);
 
     BackendCommunication backendCommunication;
 
@@ -54,10 +59,15 @@ public class IssueView extends Composite<VerticalLayout> {
         getContent().add(layoutColumn2);
         layoutColumn2.add(h3);
         layoutColumn2.add(formLayout2Col);
-        QrcodeImageCreator qrCodeImageCreator = new QrcodeImageCreator(backendCommunication.createIssueingLink("frank"));
+        Response<String> response = backendCommunication.createIssuingLink("frank");
+        if (response.serverResponse.getStatus() == 200) {
+            QrcodeImageCreator qrCodeImageCreator = new QrcodeImageCreator(response.entity);
+            layoutColumn2.add(qrCodeImageCreator.getImage());
+            layoutColumn2.add(layoutRow);
+            layoutRow.add(buttonPrimary);
+        } else {
+            logger.info("Not showing the QR code: " + response.serverResponse.getError());
+        }
 
-        layoutColumn2.add(qrCodeImageCreator.getImage());
-        layoutColumn2.add(layoutRow);
-        layoutRow.add(buttonPrimary);
     }
 }
