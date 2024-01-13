@@ -28,7 +28,7 @@ public class QrcodeImageCreator {
         StreamResource resource = new StreamResource("image.jpg",
                 () -> imageToSTream(generateQRCodeImage(data)));
         qrCodeImage = new Image(resource,"Qrcode generating");
-        qrCodeImage.setWidth("50%");
+        qrCodeImage.setWidth("100%");
         qrCodeImage.getStyle().set("align-self", "center");
         return qrCodeImage;
     }
@@ -38,7 +38,7 @@ public class QrcodeImageCreator {
         BitMatrix bitMatrix =
                 null;
         try {
-            bitMatrix = barcodeWriter.encode(barcodeText, BarcodeFormat.QR_CODE, 200, 200);
+            bitMatrix = barcodeWriter.encode(barcodeText, BarcodeFormat.QR_CODE, 300, 300);
         } catch (WriterException e) {
             e.printStackTrace();
         }
