@@ -31,15 +31,18 @@ public class BackendCommunication {
     @Value("${verifier-uri}")
     String verifierUri;
 
+    @Value("${current-uri}")
+    String currentUri;
+
     private static Gson gson = new Gson();
 
     //verification callbacks just to see that we get calls
     //http://localhost:8080/verification-callback-api/success
     //http://localhost:8080/verification-callback-api/fail
     //where localhost the host of emfisis web3-login  ui portal(current vaadin service)
-    public Response<String> createVerificationUrl() {
+    public Response<String> createVerificationUrl(String sessionId) {
         logger.info("verifing vc");
-        Response<String> verify = verify();
+        Response<String> verify = verify(sessionId);
         logger.info(verify.serverResponse.getStatus() + ": " + verify.entity);
         return verify;
     }
@@ -59,12 +62,12 @@ public class BackendCommunication {
         return new Response<>(serverResponse, serverResponse.getEntity());
     }
 
-    public Response<String> verify() {
+    public Response<String> verify(String sessionId) {
         VPRequest credentials = new VPRequest();
         credentials.addRequestCredential(VPRequest.emfisisCredential);
         credentials.addVCPolicy(VPRequest.expired);
         String json = gson.toJson(credentials);
-        Map<String, String> headers = Map.of("successRedirectUri", "http://localhost:8080/verification-callback-api/success", "errorRedirectUri", "http://localhost:8080/verification-callback-api/error");
+        Map<String, String> headers = Map.of("successRedirectUri", currentUri+"/verification-callback-api/success/"+sessionId, "errorRedirectUri", currentUri+"/verification-callback-api/error/"+sessionId);
         ServerResponse serverResponse = RestApiClient.sendPOST(verifierUri + "/openid4vc/verify", json, headers, Optional.empty());
         return new Response<>(serverResponse, serverResponse.getEntity());
     }

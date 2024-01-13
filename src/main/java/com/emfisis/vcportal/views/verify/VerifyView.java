@@ -1,27 +1,36 @@
 package com.emfisis.vcportal.views.verify;
 
 import com.emfisis.vcportal.BackendCommunication;
+import com.emfisis.vcportal.notifications.Broadcaster;
+import com.emfisis.vcportal.notifications.NotificationReceiver;
+import com.emfisis.vcportal.notifications.UiNotifiable;
+import com.emfisis.vcportal.notifications.VpNotification;
 import com.emfisis.vcportal.utils.QrcodeImageCreator;
 import com.emfisis.vcportal.utils.RestCalling.Response;
-import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.Composite;
-import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.messages.MessageList;
 import com.vaadin.flow.component.messages.MessageListItem;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinSession;
+import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -30,7 +39,9 @@ import java.time.ZoneOffset;
 @PageTitle("Verify")
 @Route(value = "verify")
 @Uses(Icon.class)
-public class VerifyView extends Composite<VerticalLayout> {
+public class VerifyView extends Composite<VerticalLayout> implements UiNotifiable {
+
+    Logger logger = LoggerFactory.getLogger(VerifyView.class);
 
     HorizontalLayout main = new HorizontalLayout();
     VerticalLayout leftColumn;
@@ -70,14 +81,16 @@ public class VerifyView extends Composite<VerticalLayout> {
             UI.getCurrent().navigate("personal-details");
         });
         needHelp.addClickListener(this::addHelpMessages);
-
+        NotificationReceiver notificationReceiver = new NotificationReceiver();
+        notificationReceiver.setVisible(false);
+        getContent().add(notificationReceiver);
         getContent().add(main);
         leftColumn.setWidth("50%");
         main.add(leftColumn, rightColumn);
         leftColumn.add(h3);
         leftColumn.add(formLayout2Col);
-
-        verificationUrl = backendCommunication.createVerificationUrl();
+        System.out.println(VaadinSession.getCurrent().getSession().getId());
+        verificationUrl = backendCommunication.createVerificationUrl(VaadinSession.getCurrent().getSession().getId());
         if (verificationUrl.serverResponse.getStatus() == 200) {
             QrcodeImageCreator qrCodeImageCreator = new QrcodeImageCreator(verificationUrl.entity);
             Image qrCodeImage = qrCodeImageCreator.getImage();
@@ -87,6 +100,7 @@ public class VerifyView extends Composite<VerticalLayout> {
             layoutRow.add(buttonPrimary);
             leftColumn.add(layoutRow);
         }
+        VaadinSession.getCurrent().setAttribute(UiNotifiable.class, this);
     }
 
     private void addHelpMessages(ClickEvent<Button> event) {
@@ -123,4 +137,16 @@ public class VerifyView extends Composite<VerticalLayout> {
     }
 
 
+    @Override
+    public void uiNotify(VpNotification vpNotification) {
+        if(vpNotification.isValidVp()){
+            Notification notification = Notification
+                    .show("Congrats the validation of your cv completed successfully");
+            notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+        }else{
+            Notification notification = Notification
+                    .show("Sorry but the validation of your vc failed");
+            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+        }
+    }
 }
