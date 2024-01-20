@@ -17,12 +17,39 @@ public class VerificationCallbacksApi {
     Logger logger = LoggerFactory.getLogger(VerificationCallbacksApi.class);
 
     @GetMapping("/success/{id}")
-    public void verificationSuccess(@PathVariable(value = "id") String sessionId){
+    public String verificationSuccess(@PathVariable(value = "id") String sessionId){
         Broadcaster.broadcast(new VpNotification(sessionId,true));
+        return "" +
+                "<style>.correct { " +
+                "background-color: green;"+
+                "padding: 57px;"+
+                "border-radius: 60px;"+
+                "margin-left: 40%;"+
+                "margin-top: 100px;"+
+                "position: absolute;"+
+                "color: white;"+
+                "font-size: 106;"+
+                "}" +
+                "</style>" +
+                "<span class=\"correct\">&#10003;</span>";
     }
+// html example
 
     @GetMapping("/fail/{id}")
-    public void verificationFail(@PathVariable(value = "id") String sessionId){
+    public String verificationFail(@PathVariable(value = "id") String sessionId){
         Broadcaster.broadcast(new VpNotification(sessionId,false));
+        return "" +
+                "<style>.wrong { " +
+                "background-color: red;"+
+                "padding: 57px;"+
+                "border-radius: 60px;"+
+                "margin-left: 40%;"+
+                "margin-top: 100px;"+
+                "position: absolute;"+
+                "color: white;"+
+                "font-size: 106;"+
+                "}" +
+                "</style>" +
+                "<span class=\"wrong\">&#9785;</span>";
     }
 }
